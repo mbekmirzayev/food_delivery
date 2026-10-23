@@ -1,0 +1,31 @@
+services:
+  food_delivery:
+    build: .
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    env_file:
+      - env/.env.prod
+    environment:
+      - DOCKER_MODE=true
+    depends_on:
+      - food_postgres_service
+      - food_redis_service
+    ports:
+      - "9000:8081"
+
+  food_postgres_service:
+    image: postgres:alpine
+    container_name: food_postgres
+    env_file:
+      - env/.env.prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - food_data:/var/lib/postgresql
+
+  food_redis_service:
+    image: redis:alpine
+    container_name: food_redis
+    ports:
+      - "6379:6379"
+volumes:
+  food_data:
