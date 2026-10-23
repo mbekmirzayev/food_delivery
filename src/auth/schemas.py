@@ -1,22 +1,16 @@
 import enum
+from typing import Literal
 
 from pydantic import BaseModel, Field
 from pydantic import field_validator
 
 from auth.services import normalize_phone
-
-
-class RoleEnum(str, enum.Enum):
-    CUSTOMER = "customer"
-    COURIER = "courier"
-    MERCHANT = 'merchant'
+from users.schemas import UserProfile, RoleEnum
 
 
 class RegisterRequest(BaseModel):
     phone: str = Field(max_length=20, default="+998901234567")
-    first_name: str = Field(max_length=50)
-    last_name: str = Field(max_length=50)
-    role: RoleEnum = Field(default=RoleEnum.CUSTOMER)
+
 
     @field_validator('phone')
     @classmethod
@@ -39,9 +33,20 @@ class VerifyOTP(BaseModel):
         if not otp.isdigit():
             raise ValueError("bir martalik code faqat raqam bolishi kere")
         return otp
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str | None = None
+
+class CompleteRegistration(BaseModel):
+    first_name:str = Field(min_length=3, max_length=25)
+    last_name:str = Field(min_length=3, max_length=25)
+    role:RoleEnum=RoleEnum.CUSTOMER
+
+class LoginResponse(BaseModel):
+    is_new_user: Literal[False] = False
     token_type: str = "bearer"
-    message: str
-    role: RoleEnum
+    access_token: str
+    refresh_token: str
+    user: UserProfile
+
+
+class NeedRegistrationResponse(BaseModel):
+    is_new_user: Literal[True] = True
+    registration_token: str

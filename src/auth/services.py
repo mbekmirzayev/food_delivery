@@ -1,4 +1,3 @@
-import json
 import re
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -6,15 +5,15 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from fastapi import HTTPException, status
 
-from core.redis import redis_client
 from core.config import settings
+from core.redis import redis_client
 
 OTP_KEY_PREFIX = "otp"
 LIMIT_KEY_PREFIX = "limit"
-TEMP_USER_PREFIX = "temp_user"
 
 OTP_TTL = 300
 LIMIT_TTL = 60
+REGISTRATION_TOKEN_MINUTES = 10
 
 
 def normalize_phone(phone: str) -> str:
@@ -37,10 +36,6 @@ def get_otp_key(phone: str) -> str:
 
 def get_limit_key(phone: str) -> str:
     return f"{LIMIT_KEY_PREFIX}:{phone}"
-
-
-def get_temp_user_key(phone: str) -> str:
-    return f"{TEMP_USER_PREFIX}:{phone}"
 
 
 async def send_verification_code(phone: str) -> str:
@@ -70,29 +65,13 @@ async def check_verification_code(phone: str, code: str) -> bool:
 
     cached = await redis_client.get(code_key)
 
-    print(f" key={code_key} | cached={cached} | input={code}")
+    # print(f" key={code_key} | cached={cached} | input={code}")
 
     if cached is not None and str(cached) == str(code):
         await redis_client.delete(code_key, get_limit_key(phone))
         return True
 
     return False
-
-
-async def save_temp_user(data: dict) -> None:
-    phone = normalize_phone(data["phone"])
-    key = get_temp_user_key(phone)
-    await redis_client.setex(key, OTP_TTL, json.dumps(data))
-
-
-async def get_temp_user(phone: str) -> dict | None:
-    phone = normalize_phone(phone)
-    key = get_temp_user_key(phone)
-    raw_data = await redis_client.get(key)
-    if raw_data:
-        await redis_client.delete(key)
-        return json.loads(raw_data)
-    return None
 
 
 def create_access_token(user_id: str, phone: str) -> str:
@@ -123,10 +102,19 @@ def create_tokens(user_id: str, phone: str) -> dict:
     }
 
 
+def create_registration_token(phone: str) -> str:
+    payload = {
+        "sub": phone,
+        "type": "registration",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=REGISTRATION_TOKEN_MINUTES),
+    }
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
 def decode_token(token: str) -> dict:
     try:
-        return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
+        return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token muddati tugagan")
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Noto'g'ri token")
+        raise HTTPException(status_code=401, detail="Notogri token")
