@@ -14,12 +14,13 @@ if TYPE_CHECKING:
 class Address(CreatedBaseModel):
     __tablename__ = "addresses"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(Uuid,
-                                               ForeignKey("users.id", ondelete="CASCADE"),
-                                               index=True,
-                                               nullable=False,
-                                               )
-    title: Mapped[str] = mapped_column(String(50), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    # title: Mapped[str] = mapped_column(String(50), nullable=False)
     city: Mapped[str] = mapped_column(String(100), default="Tashkent", nullable=False)
     street: Mapped[str] = mapped_column(String(255), nullable=False)
     apartment: Mapped[str] = mapped_column(String(50), nullable=True)

@@ -13,5 +13,5 @@ class Category(CreatedBaseModel, SlugBaseModel):
     __tablename__ = 'categories'
 
     name: Mapped[str] = mapped_column(String(255))
-    is_Active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     products: Mapped[List["Product"]] = relationship(back_populates='category')

@@ -4,15 +4,15 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.schemas import RegisterRequest, VerifyOTP, LoginResponse, NeedRegistrationResponse, CompleteRegistration
-from auth.services import (
+from src.auth.schemas import RegisterRequest, VerifyOTP, LoginResponse, NeedRegistrationResponse, CompleteRegistration
+from src.auth.services import (
     check_verification_code,
     create_tokens,
-    send_verification_code, create_registration_token, decode_token,
+    send_verification_code, create_registration_token, decode_token, normalize_phone,
 )
 from core.database import get_db
 from src.users.models import User
-from users.schemas import UserProfile
+from src.users.schemas import UserProfile
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 bearer_scheme = HTTPBearer()
@@ -39,12 +39,12 @@ async def verify_code_api(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Kod notogri yoki eskirgan",
         )
-
-    find_user = select(User).where(User.phone == data.phone)
+    clean_phone = normalize_phone(phone=data.phone)
+    find_user = select(User).where(User.phone == clean_phone)
     result = await db.execute(find_user)
     user = result.scalar_one_or_none()
     if user:
-        tokens = create_tokens(user_id=str(user.id), phone=user.phone)
+        tokens = create_tokens(user_id=str(user.id), phone=user.phone, role=user.role)
         return LoginResponse(
             access_token=tokens["access_token"],
             refresh_token=tokens["refresh_token"],
@@ -94,7 +94,7 @@ async def complete_registration_api(
         else:
             await db.refresh(user)
 
-    tokens = create_tokens(user_id=str(user.id), phone=user.phone)
+    tokens = create_tokens(user_id=str(user.id), phone=user.phone, role=user.role)
     return LoginResponse(
         access_token=tokens["access_token"],
         refresh_token=tokens["refresh_token"],

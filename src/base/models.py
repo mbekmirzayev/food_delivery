@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import datetime
 
@@ -28,6 +29,11 @@ class SlugBaseModel(Base):
         index=True,
     )
 
+    @staticmethod
+    def make_slug(text: str) -> str:
+        slug = text.lower().strip()
+        slug = re.sub(r"[^a-z0-9]+", "-", slug)
+        return slug.strip("-")
 
 class CreatedBaseModel(UUIDBaseModel):
     __abstract__ = True
@@ -42,10 +48,3 @@ class CreatedBaseModel(UUIDBaseModel):
         onupdate=func.now(),
     )
 
-
-__all__ = [
-    "Base",
-    "UUIDBaseModel",
-    "SlugBaseModel",
-    "CreatedBaseModel",
-]

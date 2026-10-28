@@ -1,16 +1,16 @@
+from decimal import Decimal
 from typing import List, TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.products.models import Product
 from src.base.models import CreatedBaseModel
-from src.users.models import User
 
 if TYPE_CHECKING:
     from src.users.models import User
     from src.products.models import Product
+
 
 class Cart(CreatedBaseModel):
     __tablename__ = "carts"
@@ -37,3 +37,15 @@ class CartItem(CreatedBaseModel):
     quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     cart: Mapped["Cart"] = relationship("Cart", back_populates="cart_items")
     products: Mapped["Product"] = relationship("Product", back_populates="cart_items")
+
+    @property
+    def title(self) -> str:
+        return self.products.title
+
+    @property
+    def price(self) -> Decimal:
+        return self.products.price
+
+    @property
+    def merchant_id(self) -> UUID:
+        return self.products.merchant_id

@@ -4,8 +4,8 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from pydantic import field_validator
 
-from auth.services import normalize_phone
-from users.schemas import UserProfile, RoleEnum
+from src.auth.services import normalize_phone
+from src.users.schemas import UserProfile, RoleEnum
 
 
 class RegisterRequest(BaseModel):

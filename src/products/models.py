@@ -1,4 +1,3 @@
-import uuid
 from decimal import Decimal
 from typing import List, Optional, TYPE_CHECKING
 from uuid import UUID
@@ -35,7 +34,7 @@ class Product(CreatedBaseModel, SlugBaseModel):
     image: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     category: Mapped["Category"] = relationship(
         "Category",
         back_populates="products",

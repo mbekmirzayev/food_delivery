@@ -74,10 +74,11 @@ async def check_verification_code(phone: str, code: str) -> bool:
     return False
 
 
-def create_access_token(user_id: str, phone: str) -> str:
+def create_access_token(user_id: str, phone: str, role: str) -> str:
     payload = {
         "sub": str(user_id),
         "phone": phone,
+        'role': role,
         "type": "access",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_TIME),
     }
@@ -93,10 +94,10 @@ def create_refresh_token(user_id: str) -> str:
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def create_tokens(user_id: str, phone: str) -> dict:
+def create_tokens(user_id: str, phone: str, role: str) -> dict:
     clean_phone = normalize_phone(phone)
     return {
-        "access_token": create_access_token(user_id, clean_phone),
+        "access_token": create_access_token(user_id, clean_phone, role),
         "refresh_token": create_refresh_token(user_id),
         "token_type": "bearer",
     }

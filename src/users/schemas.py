@@ -9,6 +9,7 @@ class RoleEnum(str, enum.Enum):
     CUSTOMER = "customer"
     COURIER = "courier"
     MERCHANT = 'merchant'
+    ADMIN = 'admin'
 
 
 class UserProfile(BaseModel):
