@@ -16,28 +16,30 @@ if TYPE_CHECKING:
     from src.merchant.models import Merchant
 
 
+class OrderStatus(str, enum.Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    PREPARING = "preparing"
+    ON_THE_WAY = "on_the_way"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+
+
 class Order(CreatedBaseModel):
     __tablename__ = "orders"
 
-    class OrderStatus(str, enum.Enum):
-        PENDING = "pending"
-        CONFIRMED = "confirmed"
-        PREPARING = "preparing"
-        ON_THE_WAY = "on_the_way"
-        DELIVERED = "delivered"
-        CANCELLED = "cancelled"
-
     merchant_id: Mapped[UUID] = mapped_column(ForeignKey("merchants.id", ondelete="CASCADE"),
-        index=True,
-        nullable=False
-    )
+                                              index=True,
+                                              nullable=False
+                                              )
 
     order_number: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"), index=True, nullable=False)
     delivery_address_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("addresses.id", ondelete="SET NULL"),
                                                                 index=True, nullable=True)
-    courier_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("couriers.id", ondelete="SET NULL"), index=True,
-                                                       nullable=True)
+    courier_id: Mapped[Optional[UUID] | None] = mapped_column(ForeignKey("couriers.id", ondelete="SET NULL"),
+                                                              index=True,
+                                                              nullable=True)
     status: Mapped[OrderStatus] = mapped_column(Enum(OrderStatus), default=OrderStatus.PENDING, index=True,
                                                 nullable=False)
     total_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal("0.00"), nullable=False)

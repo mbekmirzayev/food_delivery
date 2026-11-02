@@ -1,5 +1,5 @@
 import uuid
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 
 from sqlalchemy import Float, ForeignKey, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -24,8 +24,8 @@ class Address(CreatedBaseModel):
     city: Mapped[str] = mapped_column(String(100), default="Tashkent", nullable=False)
     street: Mapped[str] = mapped_column(String(255), nullable=False)
     apartment: Mapped[str] = mapped_column(String(50), nullable=True)
-    latitude: Mapped[str] = mapped_column(Float, nullable=True)
-    longitude: Mapped[str] = mapped_column(Float, nullable=True)
+    latitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    longitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     user: Mapped["User"] = relationship("User",
                                         back_populates="addresses",

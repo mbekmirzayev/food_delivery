@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from starlette import status
@@ -23,3 +25,12 @@ async def is_admin(payload: dict = Depends(get_current_user_payload)) -> dict:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Sizda tegishli ruxsat yoq")
     return payload
+
+
+async def get_current_user_id(payload: dict = Depends(get_current_user_payload)) -> UUID:
+    raw = payload.get('sub')
+    if raw is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Token user id yoq")
+
+    return UUID(raw)

@@ -22,6 +22,16 @@ async def lifespan(app_: FastAPI):
 
 app = FastAPI(docs_url="/", lifespan=lifespan)
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(category_router, prefix="/api/v1")
 app.include_router(product_router, prefix="/api/v1")

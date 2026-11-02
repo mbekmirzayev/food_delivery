@@ -33,6 +33,7 @@ class CartOutSchema(BaseModel):
     created_at: datetime
     cart_items: List[CartProductItemList]
 
+    @computed_field
     @property
     def total_amount(self) -> Decimal:
         return sum((item.total_price for item in self.cart_items), Decimal("0.00"))
