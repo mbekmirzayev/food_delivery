@@ -5,7 +5,7 @@ from cart.schema import CartItemActionSchema
 from src.cart.schema import CartOutSchema, CartProductItemList
 from src.cart.services import CartService
 from core.database import get_db
-from core.dependencies import get_current_user_payload
+from core.dependencies import get_current_user_payload, get_current_user_id
 from src.users.models import User
 
 router = APIRouter(prefix="/cart", tags=["cart"])
@@ -15,8 +15,8 @@ router = APIRouter(prefix="/cart", tags=["cart"])
             response_model=CartOutSchema,
             status_code=status.HTTP_200_OK)
 async def get_my_cart(db: AsyncSession = Depends(get_db),
-                      current_user: User = Depends(get_current_user_payload)):
-    return await CartService.get_or_create_cart(db, current_user['sub'])
+                      current_user: User = Depends(get_current_user_id)):
+    return await CartService.get_or_create_cart(db, current_user)
 
 
 @router.put('/items',
@@ -25,9 +25,8 @@ async def get_my_cart(db: AsyncSession = Depends(get_db),
 async def update_cart_items(
         data: CartItemActionSchema,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_payload),
-                            ):
-    return await CartService.set_item_quantity(db, current_user['sub'], data)
+        user_id: User = Depends(get_current_user_id)):
+    return await CartService.set_item_quantity(db, user_id, data)
 
 @router.delete('/clear',
                response_model=CartOutSchema,

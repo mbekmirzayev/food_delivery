@@ -13,7 +13,7 @@ from src.products.models import Product
 
 
 class CartService:
-    CART_EXPIRE_TIME = 5
+    CART_EXPIRE_TIME = 60
     MAX_CART_ITEMS = 50
 
     @classmethod

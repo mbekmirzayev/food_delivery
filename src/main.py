@@ -9,6 +9,8 @@ from src.categories.router import router as category_router
 from src.products.router import router as product_router
 from src.merchant.router import router as merchant_router
 from src.cart.router import router as cart_router
+from src.orders.router import router as order_router
+from src.addresses.router import router as address_router
 
 
 @asynccontextmanager
@@ -38,3 +40,7 @@ app.include_router(product_router, prefix="/api/v1")
 app.include_router(cart_router, prefix="/api/v1")
 
 app.include_router(merchant_router, prefix="/api/v1")
+
+
+app.include_router(order_router, prefix="/api/v1")
+app.include_router(address_router, prefix="/api/v1")

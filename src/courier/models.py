@@ -12,12 +12,13 @@ if TYPE_CHECKING:
     from src.orders.models import Order
 
 
+class VehicleType(str, enum.Enum):
+    MOTO = "moto"
+    AVTO = "avto"
+
+
 class CourierProfile(CreatedBaseModel):
     __tablename__ = "couriers"
-
-    class VehicleType(str, enum.Enum):
-        MOTO = "moto"
-        AVTO = "avto"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         Uuid,

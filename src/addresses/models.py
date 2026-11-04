@@ -1,7 +1,7 @@
 import uuid
 from typing import List, TYPE_CHECKING, Optional
 
-from sqlalchemy import Float, ForeignKey, String, Uuid
+from sqlalchemy import Float, ForeignKey, String, Uuid, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.base.models import CreatedBaseModel
@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 class Address(CreatedBaseModel):
     __tablename__ = "addresses"
 
+    __table_args__ = (UniqueConstraint("user_id", "latitude", "longitude", name="unique_user_address"),)
+
     user_id: Mapped[uuid.UUID] = mapped_column(
         Uuid,
         ForeignKey("users.id", ondelete="CASCADE"),
@@ -23,6 +25,7 @@ class Address(CreatedBaseModel):
     # title: Mapped[str] = mapped_column(String(50), nullable=False)
     city: Mapped[str] = mapped_column(String(100), default="Tashkent", nullable=False)
     street: Mapped[str] = mapped_column(String(255), nullable=False)
+    home: Mapped[str] = mapped_column(String, nullable=False)
     apartment: Mapped[str] = mapped_column(String(50), nullable=True)
     latitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     longitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)

@@ -10,7 +10,7 @@ from src.orders.models import OrderStatus
 
 class OrderCreateSchema(BaseModel):
     delivery_address_id: UUID
-    notes: str
+    notes: Optional[str] = None
 
 
 class OrderItemsResponse(BaseModel):
@@ -51,3 +51,4 @@ class UpdateOrderStatus(BaseModel):
     status: OrderStatus
 
     model_config = ConfigDict(from_attributes=True)
+

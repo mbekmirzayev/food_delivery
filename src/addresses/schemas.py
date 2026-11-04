@@ -5,9 +5,9 @@ from pydantic import BaseModel, ConfigDict
 
 
 class CreateAddress(BaseModel):
-    user_id: UUID
     city: str
     street: str
+    home: str
     apartment: str
     latitude: float
     longitude: float
@@ -19,8 +19,9 @@ class AddressResponse(BaseModel):
     user_id: UUID
     city: str
     street: str
+    home: str
     apartment: str
-    latitude: str
+    latitude: float
     longitude: float
     updated_at: datetime
 
